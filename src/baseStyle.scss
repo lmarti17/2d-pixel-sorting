@@ -78,3 +78,15 @@ th {
 // do font face here
 
 // Custom style goes here
+body {
+  margin: 0;
+  padding: 0;
+
+  height: 150vh;
+
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+}
