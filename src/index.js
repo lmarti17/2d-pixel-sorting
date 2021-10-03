@@ -23,7 +23,6 @@ export default class Scene {
 
     this.loadImage(faceMapping, true);
     this.lastScrollPosition = window.scrollY;
-
     document.addEventListener("scroll", this.handleScroll);
   }
 
@@ -182,6 +181,10 @@ export default class Scene {
     }
   };
 }
+
+window.onbeforeunload = function () {
+  window.scrollTo(0, 0);
+};
 
 window.addEventListener("load", () => {
   new Scene();

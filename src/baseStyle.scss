@@ -83,6 +83,7 @@ body {
   padding: 0;
 
   height: 150vh;
+  overflow-y: scroll;
 
   canvas {
     position: fixed;
