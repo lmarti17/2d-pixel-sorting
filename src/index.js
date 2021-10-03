@@ -104,7 +104,6 @@ export default class Scene {
         this.canvas.width,
         this.canvas.height
       ).data;
-      console.log(data);
 
       for (var i = 0; i < data.length - 136; i += 136) {
         if (
@@ -121,8 +120,6 @@ export default class Scene {
       }
 
       this.loadImage(background);
-
-      console.log(this.mappedPosition);
     }
 
     // this.drawCanvas();
@@ -178,7 +175,6 @@ export default class Scene {
       this.drawCanvas(delta);
 
       // this.history.push(this.canvas.toDataURL());
-      // console.log(this.history);
     } else {
       // if (this.history.length > 0) {
       //   this.ctx.restore();
