@@ -1,5 +1,5 @@
-const background = require("./assets/mosaert.jpg");
-const faceMapping = require("./assets/mosaert-face.jpg");
+const background = require("./assets/jim-basio-ozQ6Ve3ar1w-unsplash.jpg");
+const faceMapping = require("./assets/mask.png");
 
 export default class Scene {
   constructor() {
@@ -11,12 +11,13 @@ export default class Scene {
       w: window.innerWidth,
       h: window.innerHeight,
     };
+    this.img;
 
     this.history = [];
 
-    this.randomPixelPositions = this.getRandomPixelsPosition(
-      this.NUMBER_PIXELS
-    );
+    // this.randomPixelPositions = this.getRandomPixelsPosition(
+    //   this.NUMBER_PIXELS
+    // );
     this.imageData = [];
     this.mappedPosition = [];
     this.createCanvas();
@@ -30,17 +31,17 @@ export default class Scene {
    * [getRandomPixelsPosition description]
    * @return {[Array]} Array of random {x,y} position in canvas
    */
-  getRandomPixelsPosition() {
-    let result = [];
+  // getRandomPixelsPosition() {
+  //   let result = [];
 
-    for (var i = 0; i < this.NUMBER_PIXELS; i++) {
-      result.push({
-        x: Math.floor(Math.random() * this.size.w),
-        y: Math.floor(Math.random() * this.size.h),
-      });
-    }
-    return result;
-  }
+  //   for (var i = 0; i < this.NUMBER_PIXELS; i++) {
+  //     result.push({
+  //       x: Math.floor(Math.random() * this.size.w),
+  //       y: Math.floor(Math.random() * this.size.h),
+  //     });
+  //   }
+  //   return result;
+  // }
 
   /**
    * Create canvas
@@ -48,8 +49,8 @@ export default class Scene {
   createCanvas() {
     this.canvas = document.getElementById("canvas");
     this.ctx = canvas.getContext("2d");
-    this.canvas.width = this.size.w;
-    this.canvas.height = this.size.h;
+    this.canvas.width = this.size.w * window.devicePixelRatio;
+    this.canvas.height = this.size.h * window.devicePixelRatio;
   }
 
   /**
@@ -60,24 +61,41 @@ export default class Scene {
     img.src = src;
     let that = this;
 
+    if (!toMap) {
+      that.img = img;
+    }
+
     img.onload = function () {
-      let imgCoords = {
-        x: Math.abs(img.width - that.size.w) / 2,
-        y: Math.abs(img.height - that.size.h) / 2,
+      that.imgCoords = {
+        x:
+          Math.abs(
+            that.canvas.width -
+              ((window.innerHeight * img.width) / img.height) *
+                window.devicePixelRatio
+          ) / 2,
+        y: Math.abs(that.canvas.height - img.height) / 2,
       };
 
-      that.ctx.drawImage(
-        img,
-        0,
-        0,
-        window.innerWidth,
-        (window.innerWidth * img.height) / img.width
-      );
-
-      // let data = that.ctx.getImageData(0, 0, canvas.width, canvas.height);
+      that.drawImage(img);
 
       that.getData(toMap);
     };
+  }
+
+  clearCanvas() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  drawImage(img) {
+    this.ctx.drawImage(
+      img,
+      this.imgCoords.x,
+      0,
+      ((window.innerHeight * img.width) / img.height) * window.devicePixelRatio,
+      // window.innerWidth * window.devicePixelRatio,
+      window.innerHeight * window.devicePixelRatio
+      // ((window.innerWidth * img.height) / img.width) * window.devicePixelRatio
+    );
   }
 
   getData(toMap) {
@@ -104,7 +122,7 @@ export default class Scene {
         this.canvas.height
       ).data;
 
-      for (var i = 0; i < data.length - 136; i += 136) {
+      for (var i = 0; i < data.length - 272; i += 272) {
         if (
           data[i] == 0 &&
           data[i + 1] == 0 &&
@@ -120,8 +138,6 @@ export default class Scene {
 
       this.loadImage(background);
     }
-
-    // this.drawCanvas();
   }
 
   getPixelColor(index) {
@@ -164,21 +180,12 @@ export default class Scene {
       this.ctx.lineWidth = 3;
       this.ctx.stroke();
     });
-
-    // this.ctx.drawImage(0, 0, position.w, position.h)
   }
 
   handleScroll = (event) => {
     let delta = window.scrollY - this.lastScrollPosition;
-    if (delta >= 0) {
-      this.drawCanvas(delta);
 
-      // this.history.push(this.canvas.toDataURL());
-    } else {
-      // if (this.history.length > 0) {
-      //   this.ctx.restore();
-      // }
-    }
+    this.drawCanvas(delta);
   };
 }
 
@@ -187,5 +194,16 @@ window.onbeforeunload = function () {
 };
 
 window.addEventListener("load", () => {
-  new Scene();
+  let scene = new Scene();
+  document.getElementById("refresh").addEventListener("click", () => {
+    window.scrollTo(0, 0);
+    scene.clearCanvas();
+    scene.drawImage(scene.img);
+  });
+
+  window.onresize = function () {
+    window.scrollTo(0, 0);
+    scene.clearCanvas();
+    scene.drawImage(scene.img);
+  };
 });
